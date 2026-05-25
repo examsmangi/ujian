@@ -1,101 +1,128 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examsmangi Web Portal v1.0.3</title>
+    <title>Examsmangi PC Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* Paksa tinggi penuh agar tidak hancur di SEB */
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background: #1e3a8a; }
         .glass { background: rgba(255, 255, 255, 0.95); }
-        body { background: #1e3a8a; font-family: sans-serif; margin: 0; overflow: hidden; }
-        .full-screen { height: 100vh; width: 100%; display: flex; flex-direction: column; position: relative; }
-        iframe { flex-grow: 1; border: none; width: 100%; height: 100%; background: white; }
-        .timer-badge { background: #ef4444; color: white; padding: 6px 16px; border-radius: 999px; font-weight: bold; font-family: monospace; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* Container Utama */
+        .app-container { height: 100%; display: flex; flex-direction: column; }
+        
+        /* Section Ujian - Fixed Height Logic */
+        #ujian-section { display: none; height: 100%; flex-direction: column; background: white; }
+        #header-ujian { height: 70px; flex-shrink: 0; } /* Tinggi header dikunci */
+        #iframe-container { flex-grow: 1; position: relative; width: 100%; }
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .timer-badge { background: #ef4444; color: white; padding: 6px 16px; border-radius: 999px; font-weight: bold; font-family: monospace; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .banner-show { transform: translateY(0) !important; opacity: 1 !important; z-index: 100; }
-        .app-section { display: none; }
+        .app-section { height: 100%; width: 100%; }
     </style>
 </head>
 <body>
-    <div id="app" class="w-full">
-        <div id="loading-init" class="min-h-screen flex items-center justify-center">
-            <div class="animate-spin h-10 w-10 border-4 border-white border-t-transparent rounded-full"></div>
+
+    <div id="app" class="app-container">
+        <!-- LOADING -->
+        <div id="loading-init" class="h-full flex items-center justify-center">
+            <div class="animate-spin h-12 w-12 border-4 border-white border-t-transparent rounded-full"></div>
         </div>
 
         <!-- SECTION 1: TOKEN -->
-        <div id="token-section" class="app-section min-h-screen flex items-center justify-center p-4">
-            <div class="glass rounded-3xl p-8 shadow-2xl text-center max-w-md w-full border-t-8 border-blue-500">
-                <h2 class="text-2xl font-black text-blue-900 mb-2">EXAMSMANGI PORTAL</h2>
-                <p class="text-gray-500 mb-6 text-sm italic">"Ujian Jujur, Prestasi Luhur"</p>
+        <div id="token-section" class="app-section flex items-center justify-center p-4" style="display: none;">
+            <div class="glass rounded-3xl p-10 shadow-2xl text-center max-w-md w-full border-t-8 border-blue-500">
+                <h2 class="text-3xl font-black text-blue-900 mb-2">EXAMSMANGI PC</h2>
+                <p class="text-gray-500 mb-8 italic">"Portal Ujian Desktop v1.0.3"</p>
+                
                 <div id="recovery-zone" class="hidden mb-6">
-                    <button onclick="attemptRestore()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 animate-bounce">
-                        <i class="fas fa-undo"></i> LANJUTKAN UJIAN TERAKHIR
+                    <button onclick="attemptRestore()" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 animate-pulse">
+                        <i class="fas fa-undo"></i> LANJUTKAN UJIAN
                     </button>
-                    <div class="flex items-center my-4"><hr class="flex-grow border-gray-300"><span class="px-3 text-gray-400 text-xs">ATAU MASUK BARU</span><hr class="flex-grow border-gray-300"></div>
                 </div>
-                <input type="text" id="token-input" placeholder="MASUKKAN TOKEN" class="w-full text-center py-4 rounded-2xl border-2 mb-4 text-2xl font-mono uppercase focus:border-blue-500 outline-none">
-                <button onclick="validateToken()" id="btn-masuk" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">
-                    <span id="btn-text">CEK JADWAL</span>
-                    <div id="loader" class="hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+
+                <input type="text" id="token-input" placeholder="INPUT TOKEN" class="w-full text-center py-5 rounded-2xl border-4 border-gray-100 mb-6 text-3xl font-mono uppercase focus:border-blue-500 outline-none">
+                <button onclick="validateToken()" id="btn-masuk" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xl py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3">
+                    <span id="btn-text">MASUK UJIAN</span>
+                    <div id="loader" class="hidden animate-spin h-6 w-6 border-4 border-white border-t-transparent rounded-full"></div>
                 </button>
-                <p id="error-msg" class="text-red-500 mt-4 hidden font-semibold text-sm"></p>
+                <p id="error-msg" class="text-red-500 mt-4 hidden font-bold"></p>
             </div>
         </div>
 
         <!-- SECTION 2: MAPEL -->
-        <div id="mapel-section" class="app-section min-h-screen p-6">
-            <div class="max-w-2xl mx-auto">
-                <div class="flex justify-between items-center mb-6 bg-white/10 p-4 rounded-2xl text-white">
-                    <h3 class="font-bold">Pilih Mata Pelajaran:</h3>
-                    <button onclick="clearSession()" class="bg-red-500 px-3 py-1 rounded-lg text-xs">Keluar</button>
+        <div id="mapel-section" class="app-section overflow-y-auto p-8" style="display: none;">
+            <div class="max-w-3xl mx-auto">
+                <div class="flex justify-between items-center mb-8 bg-white/20 p-6 rounded-3xl text-white">
+                    <h3 class="text-xl font-bold"><i class="fas fa-list-ul mr-3"></i>Pilih Mata Pelajaran</h3>
+                    <button onclick="clearSession()" class="bg-red-500 hover:bg-red-600 px-6 py-2 rounded-xl font-bold text-sm">KELUAR</button>
                 </div>
-                <div id="mapel-container" class="grid grid-cols-1 gap-4"></div>
+                <div id="mapel-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             </div>
         </div>
 
-        <!-- SECTION 3: UJIAN -->
-        <div id="ujian-section" class="app-section full-screen bg-white">
-            <div id="notif-banner" style="transform: translateY(-120%); transition: all 0.5s ease; opacity: 0;" class="absolute top-16 left-0 right-0 p-4">
-                <div id="banner-content" class="max-w-xl mx-auto rounded-2xl p-4 shadow-2xl flex items-center gap-4 text-white">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div><h5 id="banner-title" class="font-bold">PERINGATAN</h5><p id="banner-text" class="text-xs"></p></div>
-                    <button id="banner-close" onclick="hideBanner()" class="ml-auto opacity-50"><i class="fas fa-times"></i></button>
+        <!-- SECTION 3: UJIAN (PC OPTIMIZED) -->
+        <div id="ujian-section">
+            <!-- BANNER NOTIFIKASI -->
+            <div id="notif-banner" style="transform: translateY(-120%); transition: all 0.5s ease; opacity: 0;" class="absolute top-20 left-0 right-0 p-4 z-[100]">
+                <div class="max-w-2xl mx-auto rounded-3xl p-5 shadow-2xl flex items-center gap-4 text-white bg-red-600 border-4 border-white/20" id="banner-content">
+                    <i class="fas fa-exclamation-circle text-3xl" id="banner-icon"></i>
+                    <div>
+                        <h5 class="font-black text-lg" id="banner-title">PENGUMUMAN</h5>
+                        <p class="text-sm font-bold" id="banner-text"></p>
+                    </div>
+                    <button id="banner-close" onclick="hideBanner()" class="ml-auto text-3xl">&times;</button>
                 </div>
             </div>
-            <div class="bg-slate-100 border-b p-3 flex justify-between items-center shadow-md z-40">
-                <div class="flex items-center gap-3">
-                    <button onclick="konfirmasiKeluar()" class="text-red-500 text-2xl"><i class="fas fa-times-circle"></i></button>
-                    <div class="border-l pl-3">
-                        <h4 id="display-mapel" class="font-black text-blue-900 leading-none text-sm uppercase">MAPEL</h4>
-                        <p id="display-info" class="text-[10px] text-gray-500 font-bold uppercase">INFO</p>
+
+            <!-- Header Desktop -->
+            <div id="header-ujian" class="bg-slate-100 border-b-2 border-gray-200 px-6 flex justify-between items-center">
+                <div class="flex items-center gap-6">
+                    <button onclick="konfirmasiKeluar()" class="text-red-500 text-3xl hover:scale-110 transition-transform">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                    <div>
+                        <h4 id="display-mapel" class="font-black text-blue-900 text-xl leading-none">MATA PELAJARAN</h4>
+                        <p id="display-info" class="text-xs text-gray-500 font-black uppercase tracking-tighter mt-1">KELAS / SESI</p>
                     </div>
                 </div>
-                <div class="flex flex-col items-end">
-                    <span class="text-[9px] text-gray-400 font-bold">SISA WAKTU</span>
-                    <div id="timer" class="timer-badge">00:00:00</div>
+                
+                <div class="flex items-center gap-8">
+                    <div class="text-right">
+                        <span class="block text-[10px] font-black text-gray-400 uppercase mb-1">SISA WAKTU UJIAN</span>
+                        <div id="timer" class="timer-badge">00:00:00</div>
+                    </div>
                 </div>
             </div>
-            <iframe id="iframe-soal" src="about:blank" allow="geolocation; microphone; camera"></iframe>
+
+            <!-- Iframe Area -->
+            <div id="iframe-container">
+                <iframe id="iframe-soal" src="about:blank" allow="geolocation; microphone; camera"></iframe>
+            </div>
         </div>
     </div>
 
     <script>
-        const SCRIPT_ID = "AKfycbxQPc8kSn9_ElGLRdNo_fTF38fTYARYKVoDUuU7tLJxIAmEuK9lk1FyH2_6rzVFdJ8l";
+        const SCRIPT_ID = "AKfycbwABrQEqVtZEpMRHHg3Rr8iS5kmRhPNRtZN2bWJXZFKqC7DvphtppcDlLNFlO7cij2qSg";
         const API_URL = `https://script.google.com/macros/s/${SCRIPT_ID}/exec`;
         let countdownInterval;
-
-        function getSavedSession() {
-            const storageData = localStorage.getItem('activeExam') || sessionStorage.getItem('activeExam');
-            if (storageData) return JSON.parse(storageData);
-            if (window.name && window.name.includes("endTime")) return JSON.parse(window.name);
-            return null;
-        }
+        let sisaWaktuDetik = 0;
 
         function saveSession(data) {
             const str = JSON.stringify(data);
             localStorage.setItem('activeExam', str);
-            sessionStorage.setItem('activeExam', str);
             window.name = str;
+        }
+
+        function getSavedSession() {
+            const saved = localStorage.getItem('activeExam');
+            if (saved) return JSON.parse(saved);
+            if (window.name && window.name.includes("endTime")) return JSON.parse(window.name);
+            return null;
         }
 
         function initApp() {
@@ -104,108 +131,55 @@
                 const diff = Math.floor((data.endTime - Date.now()) / 1000);
                 if (diff > 0) {
                     restoreUjian(data);
-                    setTimeout(() => {
-                        if (document.getElementById('ujian-section').style.display !== 'flex') {
-                            showTokenScreen(true);
-                        }
-                    }, 1500);
                     return;
                 }
             }
-            showTokenScreen(false);
-        }
-
-        function showTokenScreen(withRecovery) {
             hideAll();
-            document.getElementById('loading-init').style.display = 'none';
             document.getElementById('token-section').style.display = 'flex';
-            if (withRecovery) document.getElementById('recovery-zone').classList.remove('hidden');
-        }
-
-        function attemptRestore() {
-            const data = getSavedSession();
-            if (data) restoreUjian(data);
         }
 
         async function validateToken() {
-            const tokenInput = document.getElementById('token-input');
-            const token = tokenInput.value.trim().toUpperCase();
-
+            const token = document.getElementById('token-input').value.trim().toUpperCase();
             if (!token) return alert("Isi token!");
-            
             toggleLoader(true);
-            const errorMsg = document.getElementById('error-msg');
-            errorMsg.classList.add('hidden');
-
-            const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
-            
-            window[callbackName] = function(data) {
-                delete window[callbackName];
-                const s = document.getElementById(callbackName);
-                if(s) document.body.removeChild(s);
-                toggleLoader(false);
-
-                if (Array.isArray(data) && data.length > 0) {
-                    showMapelList(data);
-                } else if (data.status === "error") {
-                    showError("Server: " + data.message);
-                } else {
-                    showError("Token salah atau jadwal tidak ditemukan.");
-                }
-            };
-
-            const script = document.createElement('script');
-            script.id = callbackName;
-            // PASTIKAN API_URL di sini adalah URL dari SCRIPT JEMBATAN (bukan script utama)
-            script.src = `${API_URL}?token=${token}&callback=${callbackName}`;
-            
-            script.onerror = function() {
-                toggleLoader(false);
-                // Pesan ini muncul jika domain script.google.com diblokir oleh SEB atau jaringan
-                showError("Koneksi ditolak browser. Periksa Filter URL di SEB (Izinkan script.google.com)");
-            };
-            document.body.appendChild(script);
+            try {
+                const response = await fetch(`${API_URL}?token=${token}`);
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) showMapelList(data);
+                else showError("Token salah!");
+            } catch (err) { showError("Koneksi bermasalah."); }
+            finally { toggleLoader(false); }
         }
 
-        function showMapelList(jadwalList) {
+        function showMapelList(list) {
             hideAll();
             document.getElementById('mapel-section').style.display = 'block';
             const container = document.getElementById('mapel-container');
             container.innerHTML = "";
-            jadwalList.forEach(mapel => {
+            list.forEach(m => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-2xl shadow-lg border-l-8 border-blue-500 cursor-pointer hover:bg-blue-50 mb-4";
-                card.innerHTML = `<h4 class="font-bold text-blue-900">${mapel.Mapel}</h4><p class="text-xs text-gray-500">Kelas ${mapel.Kelas} | ${mapel.Durasi} Menit</p>`;
-                card.onclick = () => bukaUjian(mapel);
+                card.className = "bg-white p-8 rounded-3xl shadow-xl border-l-[12px] border-blue-600 cursor-pointer hover:bg-blue-50 transition-all";
+                card.innerHTML = `<h4 class="font-black text-blue-900 text-2xl mb-2">${m.Mapel}</h4><p class="font-bold text-gray-500 uppercase tracking-widest">Kelas ${m.Kelas} | ${m.Durasi} Menit</p>`;
+                card.onclick = () => bukaUjian(m);
                 container.appendChild(card);
             });
         }
 
-        function bukaUjian(mapel) {
-            const duration = parseInt(mapel.Durasi) || 0;
-            const endTime = Date.now() + (duration * 60 * 1000);
-            const examData = {
-                url: mapel["Link Soal"],
-                nama: mapel.Mapel,
-                kelas: mapel.Kelas,
-                sesi: mapel.Sesi,
-                endTime: endTime
-            };
-            saveSession(examData);
-            restoreUjian(examData);
+        function bukaUjian(m) {
+            const end = Date.now() + (parseInt(m.Durasi) * 60 * 1000);
+            const data = { url: m["Link Soal"], nama: m.Mapel, kelas: m.Kelas, sesi: m.Sesi, endTime: end };
+            saveSession(data);
+            restoreUjian(data);
         }
 
         function restoreUjian(data) {
             hideAll();
-            document.getElementById('loading-init').style.display = 'none';
             document.getElementById('ujian-section').style.display = 'flex';
             document.getElementById('display-mapel').innerText = data.nama;
             document.getElementById('display-info').innerText = `Kelas ${data.kelas} | Sesi ${data.sesi}`;
-            let finalUrl = data.url;
-            if (finalUrl.includes("forms") && !finalUrl.includes("embedded=true")) {
-                finalUrl += (finalUrl.includes("?") ? "&" : "?") + "embedded=true";
-            }
-            document.getElementById('iframe-soal').src = finalUrl;
+            let url = data.url;
+            if (url.includes("forms") && !url.includes("embedded=true")) url += (url.includes("?")?"&":"?") + "embedded=true";
+            document.getElementById('iframe-soal').src = url;
             startTimer(data.endTime);
         }
 
@@ -215,23 +189,22 @@
                 const diff = Math.floor((endTime - Date.now()) / 1000);
                 if (diff <= 0) {
                     clearInterval(countdownInterval);
-                    document.getElementById('timer').innerText = "HABIS";
-                    showBanner("WAKTU HABIS!", "Segera tekan KIRIM!", "bg-red-600", false);
+                    document.getElementById('timer').innerText = "WAKTU HABIS";
+                    showBanner("WAKTU HABIS!", "Segera tekan tombol KIRIM di bawah!", "bg-red-600", false);
                     return;
                 }
-                if (diff === 600) showBanner("10 MENIT LAGI", "Periksa kembali jawaban.", "bg-orange-500", true);
-                const h = Math.floor(diff / 3600), m = Math.floor((diff % 3600) / 60), s = diff % 60;
+                if (diff === 600) showBanner("10 MENIT LAGI", "Waktu hampir habis, cek kembali jawaban.", "bg-orange-500", true);
+                const h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60;
                 document.getElementById('timer').innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
             }, 1000);
         }
 
         function konfirmasiKeluar() {
-            if (confirm("Yakin ingin keluar? Pastikan JAWABAN SUDAH TERKIRIM!")) clearSession();
+            if (confirm("Yakin keluar? Pastikan SUDAH KIRIM JAWABAN!")) clearSession();
         }
 
         function clearSession() {
             localStorage.removeItem('activeExam');
-            sessionStorage.removeItem('activeExam');
             window.name = "";
             location.reload();
         }
@@ -243,30 +216,28 @@
             });
         }
 
-        function toggleLoader(show) {
-            document.getElementById('loader').classList.toggle('hidden', !show);
-            document.getElementById('btn-text').innerText = show ? "Mengecek..." : "CEK JADWAL";
+        function toggleLoader(s) {
+            document.getElementById('loader').classList.toggle('hidden', !s);
+            document.getElementById('btn-text').innerText = s ? "Mengecek..." : "MASUK UJIAN";
         }
 
-        function showError(msg) {
-            const err = document.getElementById('error-msg');
-            err.innerText = msg; err.classList.remove('hidden');
-        }
-        
-        function showBanner(title, text, color, canClose) {
-            const b = document.getElementById('notif-banner');
-            document.getElementById('banner-content').className = `max-w-xl mx-auto rounded-2xl p-4 shadow-2xl flex items-center gap-4 text-white ${color}`;
-            document.getElementById('banner-title').innerText = title;
-            document.getElementById('banner-text').innerText = text;
-            document.getElementById('banner-close').style.display = canClose ? 'block' : 'none';
-            b.style.transform = "translateY(0)";
-            b.style.opacity = "1";
+        function showError(m) {
+            const e = document.getElementById('error-msg');
+            e.innerText = m; e.classList.remove('hidden');
         }
 
-        function hideBanner() { 
+        function showBanner(t, msg, c, can) {
             const b = document.getElementById('notif-banner');
-            b.style.transform = "translateY(-120%)";
-            b.style.opacity = "0";
+            document.getElementById('banner-content').className = `max-w-2xl mx-auto rounded-3xl p-6 shadow-2xl flex items-center gap-4 text-white ${c}`;
+            document.getElementById('banner-title').innerText = t;
+            document.getElementById('banner-text').innerText = msg;
+            document.getElementById('banner-close').style.display = can ? 'block' : 'none';
+            b.style.transform = "translateY(0)"; b.style.opacity = "1";
+        }
+
+        function hideBanner() {
+            const b = document.getElementById('notif-banner');
+            b.style.transform = "translateY(-120%)"; b.style.opacity = "0";
         }
 
         initApp();
