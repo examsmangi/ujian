@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examsmangi PC Portal v21</title>
+    <title>Examsmangi PC Portal v22</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -23,6 +23,7 @@
 </head>
 <body>
     <div id="app">
+        <!-- LOADING -->
         <div id="loading-init" class="section-container">
             <div class="text-center">
                 <div class="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -30,8 +31,9 @@
             </div>
         </div>
 
+        <!-- TOKEN SCREEN -->
         <div id="token-section" class="section-container" style="display: none;">
-            <div class="bright-card p-10 max-w-lg w-full mx-4 text-center">
+            <div class="bright-card p-10 max-w-lg w-full mx-4 text-center border-t-8 border-blue-600">
                 <div class="mb-8">
                     <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-blue-200">
                         <i class="fas fa-graduation-cap text-2xl text-white"></i>
@@ -49,6 +51,7 @@
             </div>
         </div>
 
+        <!-- MAPEL SCREEN -->
         <div id="mapel-section" class="section-container" style="display: none; overflow-y: auto; align-items: start; padding-top: 5vh;">
             <div class="max-w-4xl w-full p-8">
                 <div class="flex justify-between items-center mb-8">
@@ -59,6 +62,7 @@
             </div>
         </div>
 
+        <!-- UJIAN SCREEN -->
         <div id="ujian-section">
             <div id="notif-banner" class="banner-slide fixed top-20 left-0 right-0 p-4 z-[100]">
                 <div id="banner-content" class="max-w-2xl mx-auto rounded-3xl p-6 shadow-2xl flex items-center gap-6 text-white border-4 border-white/10">
@@ -80,13 +84,31 @@
                 </div>
                 <div id="timer" class="timer-badge">00:00:00</div>
             </div>
-            <div id="iframe-container"><iframe id="iframe-soal" src="about:blank"></iframe></div>
+            <div id="iframe-container">
+                <iframe id="iframe-soal" src="about:blank" allow="geolocation; microphone; camera"></iframe>
+            </div>
         </div>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxQPc8kSn9_ElGLRdNo_fTF38fTYARYKVoDUuU7tLJxIAmEuK9lk1FyH2_6rzVFdJ8l/exec";
         let countdownInterval;
+        let iframeLoadCount = 0;
+
+        // --- DETEKSI KIRIM JAWABAN (AUTOMATIC REDIRECT) ---
+        document.getElementById('iframe-soal').onload = function() {
+            iframeLoadCount++;
+            // Iframe load count > 1 biasanya menandakan form telah disubmit/dialihkan ke halaman sukses
+            if (iframeLoadCount > 1) {
+                setTimeout(() => {
+                    if (getSavedSession()) {
+                        hideBanner();
+                        clearSession(); // Otomatis kembali ke TOKEN
+                    }
+                }, 3000);
+            }
+        };
+
         function saveSession(d) { localStorage.setItem('activeExam', JSON.stringify(d)); window.name = JSON.stringify(d); }
         function getSavedSession() { const s = localStorage.getItem('activeExam') || window.name; try { return s && s.includes("endTime") ? JSON.parse(s) : null; } catch(e) { return null; } }
         
@@ -113,14 +135,16 @@
             const c = document.getElementById('mapel-container'); c.innerHTML = "";
             list.forEach(m => {
                 const card = document.createElement('div'); card.className = "bright-card p-6 cursor-pointer hover:border-blue-500 transition-all group";
-                card.innerHTML = `<h4 class="font-black text-slate-800 text-xl mb-1">${m.Mapel}</h4><p class="text-xs font-bold text-slate-400 uppercase mb-4">${m.Kelas}</p><div class="text-blue-600 font-bold text-xs">Mulai Ujian <i class="fas fa-arrow-right ml-1"></i></div>`;
+                card.innerHTML = `<div class="flex justify-between items-center mb-3"><div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="fas fa-file-alt"></i></div><span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded-full">AKTIF</span></div><h4 class="font-black text-slate-800 text-xl mb-1">${m.Mapel}</h4><p class="text-xs font-bold text-slate-400 uppercase mb-4">${m.Kelas}</p><div class="flex items-center text-blue-600 font-bold text-xs">Mulai Ujian <i class="fas fa-arrow-right ml-1"></i></div>`;
                 card.onclick = () => { const d = { url: m["Link Soal"], nama: m.Mapel, kelas: m.Kelas, sesi: m.Sesi, endTime: Date.now() + (parseInt(m.Durasi)*60000) }; saveSession(d); restoreUjian(d); };
                 c.appendChild(card);
             });
         }
 
         function restoreUjian(data) {
-            hideAll(); document.getElementById('ujian-section').style.display = 'flex';
+            hideAll(); 
+            iframeLoadCount = 0; // Reset counter saat ujian baru/muat ulang
+            document.getElementById('ujian-section').style.display = 'flex';
             document.getElementById('display-mapel').innerText = data.nama;
             document.getElementById('display-info').innerText = `KELAS ${data.kelas} • SESI ${data.sesi}`;
             let url = data.url; if (url.includes("forms")) url += (url.includes("?")?"&":"?") + "embedded=true";
@@ -154,7 +178,14 @@
 
         function hideBanner() { const b = document.getElementById('notif-banner'); b.style.transform = "translateY(-130%)"; b.style.opacity = "0"; }
         function konfirmasiKeluar() { if(confirm("Pastikan Jawaban sudah TERKIRIM. Keluar?")) clearSession(); }
-        function clearSession() { localStorage.removeItem('activeExam'); window.name=""; location.reload(); }
+        
+        function clearSession() { 
+            localStorage.removeItem('activeExam'); 
+            window.name=""; 
+            // Menggunakan location.replace agar halaman benar-benar segar dan ke tampilan token
+            location.replace(window.location.origin + window.location.pathname);
+        }
+
         function hideAll() { ['loading-init', 'token-section', 'mapel-section', 'ujian-section'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; }); }
         function toggleLoader(s) { document.getElementById('loader').classList.toggle('hidden', !s); document.getElementById('btn-text').style.display = s ? 'none' : 'block'; }
         function showError(m) { const e = document.getElementById('error-msg'); e.innerText = m; e.classList.remove('hidden'); }
