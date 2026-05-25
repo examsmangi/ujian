@@ -3,89 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examsmangi PC Portal</title>
+    <title>Examsmangi PC Portal v20</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-
-        html, body, #app { 
-            height: 100% !important; 
-            width: 100% !important;
-            margin: 0 !important; 
-            padding: 0 !important;
-            overflow: hidden;
-            background: #f0f7ff; /* Background Biru Sangat Muda */
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f7ff 100%);
-        }
-
-        /* Card Putih Bersih dengan Shadow Lembut */
-        .bright-card {
-            background: #ffffff;
-            border-radius: 2rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-            border: 1px solid #e2e8f0;
-        }
-
-        .section-container {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        #ujian-section {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-            background: white;
-        }
-
-        #iframe-container {
-            flex: 1;
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
+        html, body, #app { height: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; overflow: hidden; background: #f0f7ff; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #f0f7ff 100%); }
+        .bright-card { background: #ffffff; border-radius: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
+        .section-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        #ujian-section { display: none; flex-direction: column; height: 100%; width: 100%; background: white; }
+        #iframe-container { flex: 1; position: relative; width: 100%; height: 100%; }
         iframe { width: 100%; height: 100%; border: none; }
-
-        .timer-badge {
-            background: #1e3a8a; /* Biru Tua untuk Timer agar kontras */
-            color: white;
-            padding: 10px 24px;
-            border-radius: 14px;
-            font-weight: 800;
-            font-family: monospace;
-            font-size: 20px;
-        }
-
-        /* Styling Input agar Cerah */
-        .token-input {
-            background: #f8fafc;
-            border: 3px solid #e2e8f0;
-            color: #1e293b;
-            transition: all 0.3s ease;
-        }
-        .token-input:focus {
-            border-color: #3b82f6;
-            background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
+        .timer-badge { background: #1e3a8a; color: white; padding: 10px 24px; border-radius: 14px; font-weight: 800; font-family: monospace; font-size: 18px; }
+        .token-input { background: #f8fafc; border: 3px solid #e2e8f0; color: #1e293b; transition: all 0.3s ease; }
+        .token-input:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
     </style>
 </head>
 <body>
-
     <div id="app">
-        <!-- 1. LOADING -->
         <div id="loading-init" class="section-container">
             <div class="text-center">
                 <div class="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -93,184 +29,104 @@
             </div>
         </div>
 
-        <!-- 2. TOKEN SCREEN (BRIGHT VERSION) -->
+        <!-- TOKEN SCREEN (Font Size Adjusted) -->
         <div id="token-section" class="section-container" style="display: none;">
-            <div class="bright-card p-12 max-w-lg w-full mx-4 text-center">
-                <div class="mb-10">
-                    <div class="w-20 h-20 bg-blue-600 rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-lg shadow-blue-200">
-                        <i class="fas fa-graduation-cap text-3xl text-white"></i>
+            <div class="bright-card p-10 max-w-lg w-full mx-4 text-center">
+                <div class="mb-8">
+                    <div class="w-16 h-16 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg shadow-blue-200">
+                        <i class="fas fa-graduation-cap text-2xl text-white"></i>
                     </div>
-                    <h1 class="text-3xl font-black text-slate-800 tracking-tighter uppercase">EXAMS<span class="text-blue-600">MANGI</span></h1>
-                    <p class="text-slate-500 mt-2 font-medium">Ujian Berbasis Komputer & Smartphone</p>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tighter uppercase">EXAMSMANGI <span class="text-blue-600">PC</span></h1>
+                    <p class="text-slate-500 mt-1 text-sm font-medium">Ujian Berbasis Komputer & Desktop</p>
                 </div>
 
                 <input type="text" id="token-input" placeholder="MASUKKAN TOKEN" 
-                       class="token-input w-full rounded-2xl py-6 text-center text-4xl font-black uppercase tracking-[0.3em] outline-none mb-8">
+                       class="token-input w-full rounded-2xl py-5 text-center text-2xl md:text-3xl font-black uppercase tracking-widest outline-none mb-6 placeholder:text-sm placeholder:tracking-normal md:placeholder:text-lg">
                 
                 <button onclick="validateToken()" id="btn-masuk" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-xl py-5 rounded-2xl shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-3 active:scale-95">
-                    <span id="btn-text">MULAI UJIAN</span>
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-5 rounded-2xl shadow-xl shadow-blue-100 transition-all flex items-center justify-center gap-3">
+                    <span id="btn-text">MASUK UJIAN</span>
                     <div id="loader" class="hidden animate-spin h-6 w-6 border-4 border-white border-t-transparent rounded-full"></div>
                 </button>
-                
-                <p id="error-msg" class="text-red-500 mt-6 font-bold text-sm hidden"></p>
+                <p id="error-msg" class="text-red-500 mt-4 font-bold text-xs hidden"></p>
             </div>
         </div>
 
-        <!-- 3. MAPEL SCREEN -->
-        <div id="mapel-section" class="section-container" style="display: none; overflow-y: auto;">
+        <!-- MAPEL SCREEN -->
+        <div id="mapel-section" class="section-container" style="display: none; overflow-y: auto; align-items: start; padding-top: 5vh;">
             <div class="max-w-4xl w-full p-8">
-                <div class="flex justify-between items-center mb-10">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800">Daftar Mata Pelajaran</h2>
-                        <p class="text-slate-500 font-medium">Pilih jadwal ujian Anda di bawah ini</p>
-                    </div>
-                    <button onclick="clearSession()" class="bg-slate-200 hover:bg-red-500 hover:text-white text-slate-600 px-6 py-2 rounded-xl font-bold text-xs transition-all">KELUAR</button>
+                <div class="flex justify-between items-center mb-8">
+                    <div><h2 class="text-2xl font-black text-slate-800">Daftar Mata Pelajaran</h2><p class="text-slate-500 text-sm">Pilih jadwal ujian hari ini</p></div>
+                    <button onclick="clearSession()" class="bg-slate-200 hover:bg-red-500 hover:text-white text-slate-600 px-5 py-2 rounded-xl font-bold text-xs transition-all">LOGOUT</button>
                 </div>
-                <div id="mapel-container" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+                <div id="mapel-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
             </div>
         </div>
 
-        <!-- 4. UJIAN SCREEN -->
+        <!-- UJIAN SCREEN -->
         <div id="ujian-section">
-            <div class="h-[85px] bg-white border-b-2 border-slate-100 px-10 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-6">
-                    <button onclick="konfirmasiKeluar()" class="text-slate-300 hover:text-red-500 text-3xl transition-colors">
-                        <i class="fas fa-times-circle"></i>
-                    </button>
-                    <div class="border-l-2 border-slate-100 pl-6">
-                        <h4 id="display-mapel" class="font-black text-slate-800 text-xl leading-none uppercase">MAPEL</h4>
-                        <p id="display-info" class="text-[11px] text-blue-600 font-black mt-1 uppercase tracking-widest">INFO KELAS</p>
+            <div class="h-[80px] bg-white border-b border-slate-100 px-8 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-5">
+                    <button onclick="konfirmasiKeluar()" class="text-slate-300 hover:text-red-500 text-2xl transition-colors"><i class="fas fa-times-circle"></i></button>
+                    <div class="border-l pl-5">
+                        <h4 id="display-mapel" class="font-black text-slate-800 text-lg leading-none uppercase">MAPEL</h4>
+                        <p id="display-info" class="text-[10px] text-blue-600 font-black mt-1 uppercase tracking-widest">INFO</p>
                     </div>
                 </div>
-                <div class="flex flex-col items-end">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sisa Waktu</span>
-                    <div id="timer" class="timer-badge">00:00:00</div>
-                </div>
+                <div id="timer" class="timer-badge">00:00:00</div>
             </div>
-            <div id="iframe-container">
-                <iframe id="iframe-soal" src="about:blank"></iframe>
-            </div>
+            <div id="iframe-container"><iframe id="iframe-soal" src="about:blank"></iframe></div>
         </div>
     </div>
 
     <script>
-        // TETAP GUNAKAN URL JEMBATAN ANDA
         const API_URL = "https://script.google.com/macros/s/AKfycbxQPc8kSn9_ElGLRdNo_fTF38fTYARYKVoDUuU7tLJxIAmEuK9lk1FyH2_6rzVFdJ8l/exec";
-        
         let countdownInterval;
-
-        function saveSession(data) {
-            localStorage.setItem('activeExam', JSON.stringify(data));
-            window.name = JSON.stringify(data);
-        }
-
-        function getSavedSession() {
-            const s = localStorage.getItem('activeExam') || window.name;
-            try { return s && s.includes("endTime") ? JSON.parse(s) : null; } catch(e) { return null; }
-        }
-
+        function saveSession(data) { localStorage.setItem('activeExam', JSON.stringify(data)); window.name = JSON.stringify(data); }
+        function getSavedSession() { const s = localStorage.getItem('activeExam') || window.name; try { return s && s.includes("endTime") ? JSON.parse(s) : null; } catch(e) { return null; } }
         function initApp() {
             const data = getSavedSession();
-            if (data && Math.floor((data.endTime - Date.now()) / 1000) > 0) {
-                restoreUjian(data);
-            } else {
-                hideAll();
-                document.getElementById('token-section').style.display = 'flex';
-                document.getElementById('loading-init').style.display = 'none';
-            }
+            if (data && Math.floor((data.endTime - Date.now()) / 1000) > 0) { restoreUjian(data); } 
+            else { hideAll(); document.getElementById('token-section').style.display = 'flex'; document.getElementById('loading-init').style.display = 'none'; }
         }
-
         async function validateToken() {
             const token = document.getElementById('token-input').value.trim().toUpperCase();
-            if (!token) return;
-            
-            toggleLoader(true);
-            const callbackName = 'jsonp_' + Date.now();
+            if (!token) return; toggleLoader(true); const callbackName = 'jsonp_' + Date.now();
             window[callbackName] = function(data) {
-                delete window[callbackName];
-                const s = document.getElementById(callbackName);
-                if(s) s.remove();
-                toggleLoader(false);
-
-                if (Array.isArray(data) && data.length > 0) showMapelList(data);
-                else showError("Token tidak valid atau belum aktif.");
+                delete window[callbackName]; const s = document.getElementById(callbackName); if(s) s.remove(); toggleLoader(false);
+                if (Array.isArray(data) && data.length > 0) showMapelList(data); else showError("Token salah atau jadwal tidak aktif.");
             };
-
-            const script = document.createElement('script');
-            script.id = callbackName;
-            script.src = `${API_URL}?token=${token}&callback=${callbackName}`;
-            script.onerror = () => {
-                toggleLoader(false);
-                showError("Gagal terhubung! Periksa internet.");
-            };
+            const script = document.createElement('script'); script.id = callbackName; script.src = `${API_URL}?token=${token}&callback=${callbackName}`;
+            script.onerror = () => { toggleLoader(false); showError("Gagal terhubung! Periksa internet."); };
             document.body.appendChild(script);
         }
-
         function showMapelList(list) {
-            hideAll();
-            document.getElementById('mapel-section').style.display = 'flex';
-            const container = document.getElementById('mapel-container');
-            container.innerHTML = "";
+            hideAll(); document.getElementById('mapel-section').style.display = 'flex';
+            const container = document.getElementById('mapel-container'); container.innerHTML = "";
             list.forEach(m => {
-                const card = document.createElement('div');
-                card.className = "bright-card p-8 cursor-pointer hover:border-blue-500 hover:shadow-blue-100 transition-all group";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <i class="fas fa-file-alt text-xl"></i>
-                        </div>
-                        <span class="text-[10px] font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-full">AKTIF</span>
-                    </div>
-                    <h4 class="font-black text-slate-800 text-2xl mb-1">${m.Mapel}</h4>
-                    <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Kelas ${m.Kelas}</p>
-                    <div class="flex items-center text-blue-600 font-bold text-sm">
-                        Mulai Kerjakan <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
-                    </div>`;
-                card.onclick = () => {
-                    const data = { url: m["Link Soal"], nama: m.Mapel, kelas: m.Kelas, sesi: m.Sesi, endTime: Date.now() + (parseInt(m.Durasi)*60000) };
-                    saveSession(data);
-                    restoreUjian(data);
-                };
+                const card = document.createElement('div'); card.className = "bright-card p-6 cursor-pointer hover:border-blue-500 hover:shadow-blue-100 transition-all group";
+                card.innerHTML = `<div class="flex justify-between items-center mb-3"><div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="fas fa-file-alt"></i></div><span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded-full">AKTIF</span></div><h4 class="font-black text-slate-800 text-xl mb-1">${m.Mapel}</h4><p class="text-xs font-bold text-slate-400 uppercase mb-4">${m.Kelas}</p><div class="flex items-center text-blue-600 font-bold text-xs">Mulai Ujian <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i></div>`;
+                card.onclick = () => { const data = { url: m["Link Soal"], nama: m.Mapel, kelas: m.Kelas, sesi: m.Sesi, endTime: Date.now() + (parseInt(m.Durasi)*60000) }; saveSession(data); restoreUjian(data); };
                 container.appendChild(card);
             });
         }
-
         function restoreUjian(data) {
-            hideAll();
-            document.getElementById('ujian-section').style.display = 'flex';
-            document.getElementById('display-mapel').innerText = data.nama;
-            document.getElementById('display-info').innerText = `KELAS ${data.kelas} • SESI ${data.sesi}`;
-            
-            let url = data.url;
-            if (url.includes("forms")) url += (url.includes("?")?"&":"?") + "embedded=true";
+            hideAll(); document.getElementById('ujian-section').style.display = 'flex';
+            document.getElementById('display-mapel').innerText = data.nama; document.getElementById('display-info').innerText = `KELAS ${data.kelas} • SESI ${data.sesi}`;
+            let url = data.url; if (url.includes("forms")) url += (url.includes("?")?"&":"?") + "embedded=true";
             document.getElementById('iframe-soal').src = url;
-            
-            clearInterval(countdownInterval);
-            const display = document.getElementById('timer');
+            clearInterval(countdownInterval); const display = document.getElementById('timer');
             countdownInterval = setInterval(() => {
                 const diff = Math.floor((data.endTime - Date.now()) / 1000);
-                if (diff <= 0) {
-                    clearInterval(countdownInterval);
-                    display.innerText = "HABIS";
-                    display.style.background = "#000";
-                    alert("WAKTU UJIAN HABIS!");
-                } else {
-                    const h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60;
-                    display.innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-                }
+                if (diff <= 0) { clearInterval(countdownInterval); display.innerText = "HABIS"; alert("WAKTU UJIAN HABIS!"); } 
+                else { const h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60; display.innerText = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`; }
             }, 1000);
         }
-
-        function konfirmasiKeluar() { if(confirm("Pastikan Jawaban SUDAH TERKIRIM. Keluar?")) clearSession(); }
+        function konfirmasiKeluar() { if(confirm("Pastikan Jawaban sudah TERKIRIM. Keluar?")) clearSession(); }
         function clearSession() { localStorage.removeItem('activeExam'); window.name=""; location.reload(); }
         function hideAll() { ['loading-init', 'token-section', 'mapel-section', 'ujian-section'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; }); }
-        function toggleLoader(s) { 
-            document.getElementById('loader').classList.toggle('hidden', !s); 
-            document.getElementById('btn-text').style.display = s ? 'none' : 'block'; 
-        }
+        function toggleLoader(s) { document.getElementById('loader').classList.toggle('hidden', !s); document.getElementById('btn-text').style.display = s ? 'none' : 'block'; }
         function showError(m) { const e = document.getElementById('error-msg'); e.innerText = m; e.classList.remove('hidden'); }
-
         initApp();
     </script>
 </body>
