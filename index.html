@@ -128,20 +128,40 @@
         }
 
         async function validateToken() {
-            const token = document.getElementById('token-input').value.trim().toUpperCase();
-            if (!token) return alert("Isi token!");
-            toggleLoader(true);
-            try {
-                const response = await fetch(`${API_URL}?token=${token}`);
-                const data = await response.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    showMapelList(data);
-                } else {
-                    showError("Token salah atau jadwal tidak ditemukan.");
-                }
-            } catch (err) { showError("Koneksi error."); }
-            finally { toggleLoader(false); }
+    const tokenInput = document.getElementById('token-input');
+    const token = tokenInput.value.trim().toUpperCase();
+
+    if (!token) return alert("Isi token!");
+    
+    toggleLoader(true);
+    const errorMsg = document.getElementById('error-msg');
+    errorMsg.classList.add('hidden');
+
+    // 1. Buat nama fungsi callback unik
+    const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+    
+    // 2. Siapkan penangan data saat jawaban datang
+    window[callbackName] = function(data) {
+        delete window[callbackName]; // Bersihkan memori
+        document.body.removeChild(script); // Hapus tag skrip sementara
+        toggleLoader(false);
+
+        if (Array.isArray(data) && data.length > 0) {
+            showMapelList(data);
+        } else {
+            showError("Token salah atau jadwal tidak ditemukan.");
         }
+    };
+
+    // 3. Masukkan tag skrip ke halaman untuk memicu koneksi
+    const script = document.createElement('script');
+    script.src = `${API_URL}?token=${token}&callback=${callbackName}`;
+    script.onerror = function() {
+        toggleLoader(false);
+        showError("Gagal terhubung ke server (Cek Whitelist SEB).");
+    };
+    document.body.appendChild(script);
+}
 
         function showMapelList(jadwalList) {
             hideAll();
